@@ -10,7 +10,7 @@ const App = () => {
   return (
     <NavigationContainer>
       <RootStackScreen />
-      {/*<MainTabScreen />*/}
+      {/* <MainTabScreen />*/}
     </NavigationContainer>
 
   );
