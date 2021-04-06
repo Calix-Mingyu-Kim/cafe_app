@@ -1,20 +1,33 @@
 import React from 'react';
 import { Button, View, StyleSheet, TextInput, Text, Dimensions, Image} from 'react-native'
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Animatable from 'react-native-animatable';
 
-const SplashScreen = () => {
+
+const SplashScreen = ( {navigation} ) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Image 
+        <Animatable.Image 
+        animation="bounceIn"
+        duration="1500"
         source={require('../assets/icon.png')}
         style={styles.logo}
         resizeMode='stretch'
         />
       </View>
-      <View style={styles.footer}>
-        <Text>Footer</Text>
+      <Animatable.View animation="fadeInUpBig" style={styles.footer}>
+        <Text>Receive notifications from your favorite places to eat!</Text>
         <Text>Sign in with account</Text>
-      </View>
+        <View style={styles.button}>
+          <TouchableOpacity onPress={() => navigation.navigate('SignInScreen')}>
+            <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#4c669f', '#3b5998', '#192f6a']} style={styles.signIn}>
+              <Text style={styles.textSign}>Get Started</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+      </Animatable.View>
     </View>
   )
 }
