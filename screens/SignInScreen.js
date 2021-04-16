@@ -1,32 +1,136 @@
-import React , {useState} from 'react';
+import React , { Component } from 'react';
 import { Animated, Button, View, StyleSheet, TextInput, Platform, Text, TouchableOpacity, Dimensions} from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as Animatable from 'react-native-animatable';
 
 
+import firebase from 'firebase'
+
+export class SignUpScreen extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      email: '',
+      password: '',
+      secureTextEntry: false
+    }
+    this.onSignIn = this.onSignIn.bind(this)
+  }
+
+  onSignIn() {
+    const { email, password } = this.state;
+    firebase.auth().signInWithEmailAndPassword(email, password)
+    .then((result) => {
+      console.log(result) 
+    })
+    .catch((e) => {
+      console.log(e)
+    })
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.text_header}>Welcome, </Text>
+          <Text style={styles.text_footer}>Sign in to continue!</Text>
+        </View>
+        <View style={styles.footer}>
+          <View style={styles.action}>
+              <TextInput 
+                placeholder="Email ID" 
+                style={styles.textInput} 
+                autoCapitalize="none" 
+                onChangeText={(email) => this.setState({ email })}
+              />
+          </View>
+          <View style={styles.action}>
+            <TextInput 
+              placeholder="Password" 
+              secureTextEntry={this.state.secureTextEntry ? false : true}
+              style={styles.textInput} 
+              autoCapitalize="none" 
+              onChangeText={(password) => this.setState({ password })}
+            />
+            <TouchableOpacity 
+              onPress={() => this.setState({ secureTextEntry: !this.state.secureTextEntry })}
+            >
+              {this.state.secureTextEntry
+              ?
+              <Ionicons 
+                name='eye-outline' 
+                size={24} 
+                color='grey' 
+                paddingRight='30'
+              /> 
+              :
+              <Ionicons 
+                name='eye-off-outline' 
+                size={24} color='grey' 
+                paddingRight='30'
+              /> 
+              }
+            </TouchableOpacity>
+
+          </View>
+
+          <View alignSelf="flex-end" marginBottom={50}>
+            <TouchableOpacity>
+              <Text>Forgot Password?</Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity onPress={() => this.onSignIn()} style={styles.button} marginTop= '50'>
+            <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#4c669f', '#3b5998', '#192f6a']} style={styles.signIn}>
+              <Text style={{color: 'white', fontWeight: 'bold'}}>Sign In</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.button} marginTop= '50'>
+            <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#4c669f', '#3b5998', '#192f6a']} style={styles.signIn}>
+              <Text style={{color: 'white', fontWeight: 'bold'}}>Connect with Google</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+          
+
+
+          <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 80}}>
+            <Text style={{fontWeight: 'bold'}}>I'm a new user,</Text>
+              <TouchableOpacity onPress={() => this.props.navigation.navigate('SignUpScreen')}>
+                <Text style={{color: 'pink', fontWeight: 'bold'}}> Sign Up</Text>
+              </TouchableOpacity>
+          </View>
+
+          
+        </View>
+      </View>
+    );
+  }
+}
+
+SignUpScreen.propTypes = {
+
+};
+
+export default SignUpScreen;
+/*
+
 const SignInScreen = ({ navigation }) => {
   const [data, setData] = React.useState({
     email: '',
     password: '',
-    check_textInputChange: false,
     secureTextEntry: false
   });
 
   const textInputChange = (val) => {
-    if( val.length != 0) {
-      setData({
-        ...data,
-        email: val,
-        check_textInputChange: true
-      });
-    } else {
-      setData({
-        ...data,
-        email: val,
-        check_textInputChange: false
+    setData({
+      ...data,
+      email: val,
+      check_textInputChange: true
     });
-  }}
+  }
 
   const handlePasswordChange = (val) => {
     setData({
@@ -51,7 +155,12 @@ const SignInScreen = ({ navigation }) => {
       </View>
       <View style={styles.footer}>
         <View style={styles.action}>
-          <TextInput placeholder="Email ID" style={styles.textInput} autoCapitalize="none" />
+            <TextInput 
+              placeholder="Email ID" 
+              style={styles.textInput} 
+              autoCapitalize="none" 
+              onChangeText={(val) => textInputChange(val)}
+            />
         </View>
         <View style={styles.action}>
           <TextInput 
@@ -79,7 +188,7 @@ const SignInScreen = ({ navigation }) => {
 
         <TouchableOpacity style={styles.button} marginTop= '50'>
           <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#4c669f', '#3b5998', '#192f6a']} style={styles.signIn}>
-            <Text style={{color: 'white', fontWeight: 'bold'}}>Create Account</Text>
+            <Text style={{color: 'white', fontWeight: 'bold'}}>Sign In</Text>
           </LinearGradient>
         </TouchableOpacity>
 
@@ -107,7 +216,7 @@ const SignInScreen = ({ navigation }) => {
 }
 
 export default SignInScreen;
-
+*/
 const styles = StyleSheet.create({
   container: {
     flex: 1,

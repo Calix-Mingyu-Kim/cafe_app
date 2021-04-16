@@ -1,4 +1,4 @@
-import React , {useState} from 'react';
+import React , { Component } from 'react';
 import { Animated, Button, View, StyleSheet, TextInput, Platform, Text, TouchableOpacity, Dimensions} from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -6,28 +6,143 @@ import * as Animatable from 'react-native-animatable';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-const SignInScreen = ( {navigation} ) => {
+import firebase from 'firebase'
+
+export class SignUpScreen extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      email: '',
+      password: '',
+      name: '',
+      secureTextEntry: false
+    }
+    this.onSignUp = this.onSignUp.bind(this)
+  }
+
+  onSignUp() {
+    const { email, password, name } = this.state;
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+    .then((result) => {
+      console.log(result) 
+    })
+    .catch((e) => {
+      console.log(e)
+    })
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.text_header}>Create Account, </Text>
+        <Text style={styles.text_footer}>Sign up to get started!</Text>
+      </View>
+      <View style={styles.footer}>
+        <View style={styles.action}>
+          <TextInput 
+            placeholder="Full Name" 
+            style={styles.textInput} 
+            autoCapitalize="none" 
+            onChangeText={(name) => this.setState({ name })}
+          />
+        </View>
+        <View style={styles.action}>
+          <TextInput 
+            placeholder="Email ID" 
+            style={styles.textInput} 
+            autoCapitalize="none" 
+            onChangeText={(email) => this.setState({ email })}
+          />
+        </View>
+        <View style={styles.action}>
+          <TextInput 
+            placeholder="Password" 
+            secureTextEntry={this.state.secureTextEntry ? false : true}
+            style={styles.textInput} 
+            autoCapitalize="none" 
+            onChangeText={(password) => this.setState({ password })}
+          />
+          <TouchableOpacity 
+            onPress={() => this.setState({ secureTextEntry: !this.state.secureTextEntry })}
+          >
+            {this.state.secureTextEntry
+            ?
+            <Ionicons 
+              name='eye-outline' 
+              size={24} 
+              color='grey' 
+              paddingRight='30'
+            /> 
+            :
+            <Ionicons 
+              name='eye-off-outline' 
+              size={24} color='grey' 
+              paddingRight='30'
+            /> 
+            }
+          </TouchableOpacity>
+
+        </View>
+
+        <View alignSelf="flex-end" marginBottom={50}>
+
+        </View>
+
+        <TouchableOpacity onPress={() => this.onSignUp()} style={styles.button} marginTop= '100'>
+          <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#4c669f', '#3b5998', '#192f6a']} style={styles.signIn}>
+            <Text style={{color: 'white', fontWeight: 'bold'}}>Create Account</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.button} marginTop= '50'>
+          <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#4c669f', '#3b5998', '#192f6a']} style={styles.signIn}>
+            <Text style={{color: 'white', fontWeight: 'bold'}}>Connect with Google</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+        
+
+
+        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 80}}>
+          <Text style={{fontWeight: 'bold'}}>I'm already a member,</Text>
+            <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
+              <Text style={{color: 'pink', fontWeight: 'bold'}}> Sign In</Text>
+            </TouchableOpacity>
+          
+
+        </View>
+
+         
+      </View>
+    </View>
+    );
+  }
+}
+
+export default SignUpScreen;
+/*
+const SignInScreen = ({ navigation }) => {
   const [data, setData] = React.useState({
+    name: '',
     email: '',
     password: '',
-    check_textInputChange: false,
     secureTextEntry: false
   });
 
-  const textInputChange = (val) => {
-    if( val.length != 0) {
-      setData({
-        ...data,
-        email: val,
-        check_textInputChange: true
-      });
-    } else {
-      setData({
-        ...data,
-        email: val,
-        check_textInputChange: false
+  const nameInputChange = (val) => {
+    setData({
+      ...data,
+      name: val
     });
-  }}
+  }
+
+  const textInputChange = (val) => {
+    setData({
+      ...data,
+      email: val
+    });
+  }
 
   const handlePasswordChange = (val) => {
     setData({
@@ -43,6 +158,17 @@ const SignInScreen = ( {navigation} ) => {
     });
   }
 
+  const onSignUp = () => {
+    const { name, email, password } = setData;
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+    .then((result) => {
+      console.log(result)
+    })
+    .catch((e) => {
+      console.log(e)
+    })
+  }
+
   
     return (
     <View style={styles.container}>
@@ -52,10 +178,20 @@ const SignInScreen = ( {navigation} ) => {
       </View>
       <View style={styles.footer}>
         <View style={styles.action}>
-          <TextInput placeholder="Full Name" style={styles.textInput} autoCapitalize="none" />
+          <TextInput 
+            placeholder="Full Name" 
+            style={styles.textInput} 
+            autoCapitalize="none" 
+            onChangeText={(val) => nameInputChange(val)}
+          />
         </View>
         <View style={styles.action}>
-          <TextInput placeholder="Email ID" style={styles.textInput} autoCapitalize="none" />
+          <TextInput 
+            placeholder="Email ID" 
+            style={styles.textInput} 
+            autoCapitalize="none" 
+            onChangeText={(val) => textInputChange(val)}
+          />
         </View>
         <View style={styles.action}>
           <TextInput 
@@ -68,9 +204,21 @@ const SignInScreen = ( {navigation} ) => {
           <TouchableOpacity 
             onPress={updateSecureTextEntry}
           >
-            {data.secureTextEntry ?
-            <Ionicons name='eye-outline' size={24} color='grey' paddingRight='30'/> :
-            <Ionicons name='eye-off-outline' size={24} color='grey' paddingRight='30'/> }
+            {data.secureTextEntry 
+            ?
+            <Ionicons 
+              name='eye-outline' 
+              size={24} 
+              color='grey' 
+              paddingRight='30'
+            /> 
+            :
+            <Ionicons 
+              name='eye-off-outline' 
+              size={24} color='grey' 
+              paddingRight='30'
+            /> 
+            }
           </TouchableOpacity>
 
         </View>
@@ -79,7 +227,7 @@ const SignInScreen = ( {navigation} ) => {
 
         </View>
 
-        <TouchableOpacity style={styles.button} marginTop= '100'>
+        <TouchableOpacity onPress={()=>{}} style={styles.button} marginTop= '100'>
           <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#4c669f', '#3b5998', '#192f6a']} style={styles.signIn}>
             <Text style={{color: 'white', fontWeight: 'bold'}}>Login</Text>
           </LinearGradient>
@@ -95,7 +243,7 @@ const SignInScreen = ( {navigation} ) => {
 
         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 80}}>
           <Text style={{fontWeight: 'bold'}}>I'm already a member,</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('SignInScreen')}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
               <Text style={{color: 'pink', fontWeight: 'bold'}}> Sign In</Text>
             </TouchableOpacity>
           
@@ -109,7 +257,7 @@ const SignInScreen = ( {navigation} ) => {
 }
 
 export default SignInScreen;
-
+*/
 const styles = StyleSheet.create({
   container: {
     flex: 1,
