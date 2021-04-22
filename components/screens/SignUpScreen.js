@@ -1,12 +1,11 @@
 import React , { Component } from 'react';
-import { Animated, Button, View, StyleSheet, TextInput, Platform, Text, TouchableOpacity, Dimensions} from 'react-native'
+import { View, StyleSheet, TextInput, Text, TouchableOpacity } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import * as Animatable from 'react-native-animatable';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 
-import firebase from 'firebase'
+import firebase from 'firebase/app';
+import "firebase/firestore";
+import 'firebase/auth';
 
 export class SignUpScreen extends Component {
   constructor(props) {
@@ -22,14 +21,21 @@ export class SignUpScreen extends Component {
   }
 
   onSignUp() {
+    console.log("AHAHAHAHAHA");
     const { email, password, name } = this.state;
     firebase.auth().createUserWithEmailAndPassword(email, password)
-    .then((result) => {
-      console.log(result) 
-    })
-    .catch((e) => {
-      console.log(e)
-    })
+      .then((result) => {
+        firebase.firestore().collection("users")
+          .doc(firebase.auth().currentUser.uid)
+          .set({
+            name,
+            email
+          })
+        console.log(result) 
+      })
+      .catch((e) => {
+        console.log(e)
+      })
   }
 
   render() {

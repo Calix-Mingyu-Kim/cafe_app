@@ -1,14 +1,28 @@
-import 'react-native-gesture-handler';
 import React, { Component } from 'react';
-import { Button, View, Text, TextInput, ActivityIndicator } from 'react-native'
+import { View, Text } from 'react-native'
 
+import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-import MainTabScreen from './screens/MainTabScreen';
-import RootStackScreen from './screens/RootStackScreen';
 
-import firebase from 'firebase';
-import "firebase/auth";
-import SignUpScreen from './screens/SignUpScreen';
+import SignUpScreen from './components/screens/SignUpScreen';
+import SignInScreen from './components/screens/SignInScreen';
+import SplashScreen from './components/SplashScreen'; //for future implementation
+import MainTabScreen from './components/MainTabScreen';
+import CreateRoom from './components/screens/CreateRoom';
+
+import firebase from 'firebase/app';
+import "firebase/firestore";
+import 'firebase/auth';
+
+import { Appbar } from 'react-native-paper';
+
+import { Provider } from 'react-redux';
+import { createStore, applyMiddleware } from 'redux';
+import rootReducer from './redux/reducers';
+import thunk from 'redux-thunk';
+const store = createStore(rootReducer, applyMiddleware(thunk));
+
+const Stack = createStackNavigator();
 
 const firebaseConfig = {
   apiKey: "AIzaSyDfQ8JY2P9Sg_8hb2CrzirmPcfCB42VOqA",
@@ -20,8 +34,16 @@ const firebaseConfig = {
   measurementId: "G-8SC6DPNQXD"
 };
 
+function CustomNavigationBar({ navigation, previous}) {
+  return (
+    <Appbar.Header>
+      {previous ? <Appbar.BackAction onPress={navigation.goBack} /> : null}
+      <Appbar.Content title="Create Room" />
+    </Appbar.Header>
+  );
+}
 
-if(firebase.apps.length === 0) {
+if (firebase.apps.length === 0) {
   firebase.initializeApp(firebaseConfig);
 } 
 
@@ -61,14 +83,29 @@ export class App extends Component {
     if(!loggedIn) {
       return (
         <NavigationContainer>
-          <RootStackScreen />
+          <Stack.Navigator initialRouteName="SignInScreen">
+            <Stack.Screen name="SignInScreen" component={SignInScreen} options={{ headerShown: false }}/>
+            <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ headerShown: false }} />
+          </Stack.Navigator>
         </NavigationContainer>
       )
     }
-    return (
-      <NavigationContainer>
-        <MainTabScreen />
-      </NavigationContainer>
+  
+    return ( 
+        <Provider store={store}>
+            <NavigationContainer>
+              <Stack.Navigator 
+                initialRouteName="SplashScreen" 
+                screenOptions={{
+                  header: (props) => <CustomNavigationBar {...props} />,
+                }}
+              >
+                <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }}/>
+                <Stack.Screen name="MainTabScreen" component={MainTabScreen} options={{ headerShown: false }}/>
+                <Stack.Screen name="CreateRoom" component={CreateRoom} />
+            </Stack.Navigator>
+            </NavigationContainer>
+        </Provider>
     )
   }
 }
