@@ -1,3 +1,4 @@
+/*
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
 import firebase from 'firebase/app';
@@ -13,6 +14,7 @@ import {
   StyleSheet,
   Text,
   View,
+  TextInput
 } from 'react-native';
 import uuid from 'uuid';
 
@@ -25,11 +27,6 @@ const firebaseConfig = {
   appId: "1:17113936975:web:0e8226b8f4db1f224ba63a",
   measurementId: "G-8SC6DPNQXD"
 };
-
-const Oval = () => {
-  return <View style={styles.oval} />;
-};
-
 // Firebase sets some timeers for a long period, which will trigger some warnings. Let's turn that off for this example
 console.disableYellowBox = true;
 
@@ -37,6 +34,7 @@ export default class CreateRoom extends Component {
   state = {
     image: null,
     uploading: false,
+    name: '',
   };
 
   async componentDidMount() {
@@ -45,11 +43,11 @@ export default class CreateRoom extends Component {
   }
 
   render() {
-    let { image } = this.state;
+    let { image, name } = this.state;
 
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        {!!image && (
+        {/*!!image && (
           <Text
             style={{
               fontSize: 20,
@@ -59,18 +57,28 @@ export default class CreateRoom extends Component {
             }}>
             Example: Upload ImagePicker result
           </Text>
+          )*/
+          /*
+        {this._maybeRenderImage()}
+        this._maybeRenderUploadingOverlay()
+        {!!image && (
+          <View> 
+            <TextInput placeholder="Name" style={styles.textInput}  autoCapitalize="none" onChangeText={(name) => this.setState({ name })} />
+          </View>
+        )}
+        {!image && (
+          <View>
+
+            <Button
+              onPress={this._pickImage}
+              title="Pick an image from camera roll"
+            />
+
+            <Button onPress={this._takePhoto} title="Take a photo" />
+          </View>
         )}
 
-        <Button
-          onPress={this._pickImage}
-          title="Pick an image from camera roll"
-        />
-
-        <Button onPress={this._takePhoto} title="Take a photo" />
-
-        {this._maybeRenderImage()}
-        {this._maybeRenderUploadingOverlay()}
-
+        {console.log(name)}
         <StatusBar barStyle="default" />
       </View>
     );
@@ -118,14 +126,15 @@ export default class CreateRoom extends Component {
             shadowRadius: 5,
             overflow: 'hidden',
           }}>
-          <Image source={{ uri: image }} style={{ width: 250, height: 250 }} />
+          <Image source={{ uri: image }} style={{ width: 250, height: 250, borderRadius: 125}} />
         </View>
-        <Text
+        {/*<Text
           onPress={this._copyToClipboard}
           onLongPress={this._share}
           style={{ paddingVertical: 10, paddingHorizontal: 10 }}>
           {image}
         </Text>
+        8
       </View>
     );
   };
@@ -199,9 +208,9 @@ async function uploadImageAsync(uri) {
     .storage
     .ref()
     .child(uuid.v4());
-*/
+
   var storageRef = firebase.storage().ref();
-  var imageRef = storageRef.child('image.jpg');
+  var imageRef = storageRef.child(name + '.jpg');
 
   const snapshot = await imageRef.put(blob);
 
@@ -212,17 +221,108 @@ async function uploadImageAsync(uri) {
 }
 
 CreateRoom.title = "Create Room";
+*/
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Button, Image } from 'react-native';
+import { Camera } from 'expo-camera';
+import * as ImagePicker from 'expo-image-picker';
 
-const styles = StyleSheet.create ({
+
+export default function Add({ navigation }) {
+  const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
+  const [hasCameraPermission, setHasCameraPermission] = useState(null);
+  const [camera, setCamera] = useState(null);
+  const [image, setImage] = useState(null);
+  const [type, setType] = useState(Camera.Constants.Type.back);
+
+  useEffect(() => {
+    (async () => {
+      const cameraStatus = await Camera.requestPermissionsAsync();
+      setHasCameraPermission(cameraStatus.status === 'granted');
+
+      const galleryStatus = await ImagePicker.requestCameraRollPermissionsAsync();
+      setHasGalleryPermission(galleryStatus.status === 'granted');
+
+
+    })();
+  }, []);
+
+  const takePicture = async () => {
+    if (camera) {
+      const data = await camera.takePictureAsync(null);
+      setImage(data.uri);
+    }
+  }
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+    console.log(result);
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+    }
+  };
+
+
+  if (hasCameraPermission === null || hasGalleryPermission === false) {
+    return <View />;
+  }
+  if (hasCameraPermission === false || hasGalleryPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
+  return (
+    <View style={{ flex: 1 }}>
+      <View style={styles.cameraContainer}>
+        <Camera
+          ref={ref => setCamera(ref)}
+          style={styles.fixedRatio}
+          type={type}
+          ratio={'1:1'} />
+      </View>
+
+      <Button
+        title="Flip Image"
+        onPress={() => {
+          setType(
+            type === Camera.Constants.Type.back
+              ? Camera.Constants.Type.front
+              : Camera.Constants.Type.back
+          );
+        }}>
+      </Button>
+      <Button title="Take Picture" onPress={() => takePicture()} />
+      <Button title="Pick Image From Gallery" onPress={() => pickImage()} />
+      <Button title="Save" onPress={() => navigation.navigate('Save', { image })} />
+      {image && <Image source={{ uri: image }} style={{ flex: 1 }} />}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  cameraContainer: {
+    flex: 1,
+    flexDirection: 'row'
+  },
+  fixedRatio: {
+    flex: 1,
+    aspectRatio: 1
+  },
   image: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
   },
-  oval: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: "grey",
+  textInput: {
+    marginTop: 8,
+    marginBottom: 8,
+    paddingLeft: 10,
+    paddingRight: 10,
+    color: '#05375a'
   },
-});
+
+})
