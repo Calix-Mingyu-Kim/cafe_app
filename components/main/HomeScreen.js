@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Platform, StyleSheet } from 'react-native';
+import { View, Platform, StyleSheet, ScrollView } from 'react-native';
 import {
   Colors,
   Appbar,
@@ -10,6 +10,7 @@ import {
 } from 'react-native-paper';
 
 const HomeScreen = () => {
+  
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Home!</Text>

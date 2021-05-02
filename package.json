@@ -17,6 +17,7 @@
     "bcrpyt": "^2.0.0",
     "bcryptjs": "^2.4.3",
     "expo": "~40.0.0",
+    "expo-camera": "~9.1.0",
     "expo-cli": "^4.4.3",
     "expo-image-picker": "~9.2.0",
     "expo-linear-gradient": "^9.0.0",
@@ -38,13 +39,14 @@
     "react-native-svg": "^12.1.0",
     "react-native-vector-icons": "^8.1.0",
     "react-native-web": "^0.15.7",
+    "react-native-web-swiper": "^2.2.1",
+    "react-navigation": "^4.4.4",
     "react-navigation-header-buttons": "^7.0.1",
     "react-redux": "^7.2.3",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "request": "^2.88.2",
-    "ttf2woff2": "^4.0.2",
-    "expo-camera": "~9.1.0"
+    "ttf2woff2": "^4.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0"

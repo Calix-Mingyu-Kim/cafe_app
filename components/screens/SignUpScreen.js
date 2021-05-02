@@ -21,7 +21,6 @@ export class SignUpScreen extends Component {
   }
 
   onSignUp() {
-    console.log("AHAHAHAHAHA");
     const { email, password, name } = this.state;
     firebase.auth().createUserWithEmailAndPassword(email, password)
       .then((result) => {
