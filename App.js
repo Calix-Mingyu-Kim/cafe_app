@@ -9,8 +9,6 @@ import SignInScreen from './components/screens/SignInScreen';
 import SplashScreen from './components/SplashScreen'; //for future implementation
 import MainTabScreen from './components/MainTabScreen';
 import CreateRoom from './components/screens/CreateRoom';
-import RoomList from './components/RoomList';
-
 
 import firebase from 'firebase/app';
 import "firebase/firestore";
@@ -22,6 +20,7 @@ import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import rootReducer from './redux/reducers';
 import thunk from 'redux-thunk';
+
 const store = createStore(rootReducer, applyMiddleware(thunk));
 
 const Stack = createStackNavigator();
@@ -104,10 +103,9 @@ export class App extends Component {
               >
                 <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }}/>
                 <Stack.Screen name="SignInScreen" component={SignInScreen} options={{ headerShown: false }}/>
-                <Stack.Screen name="RoomList" component={RoomList} navigation={this.props.navigation} />
-                <Stack.Screen name="MainTabScreen" component={MainTabScreen} options={{ headerShown: false }}/>
+                <Stack.Screen name="MainTabScreen" component={MainTabScreen} navigation={this.props.navigation} options={{ headerShown: false }}/>
                 <Stack.Screen name="CreateRoom" component={CreateRoom} navigation={this.props.navigation}/>
-            </Stack.Navigator>
+              </Stack.Navigator>
             </NavigationContainer>
         </Provider>
     )

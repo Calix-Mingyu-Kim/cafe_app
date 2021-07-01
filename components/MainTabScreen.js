@@ -15,14 +15,15 @@ import ChatScreen from './main/ChatScreen';
 
 const Tab = createBottomTabNavigator();
 
-export default function MainTabScreen ({ navigation }) {
+export default function MainTabScreen ({ navigation, route }) {
+  const item = route.params;
   return (
     <Tab.Navigator initialRouteName='Home' labeled={false} 
       tabBarOptions={{
       activeTintColor: 'tomato',
       inactiveTintColor: 'gray',
       }}>
-      <Tab.Screen name='Home' component={HomeScreen}
+      <Tab.Screen name='Home' children={() => <HomeScreen item={item}/>}
         options={{
         tabBarIcon: ({ focused, color, size}) => (
           <Ionicons name='home-outline' size={size} color={color} />
@@ -40,7 +41,7 @@ export default function MainTabScreen ({ navigation }) {
           <Ionicons name='notifications-outline' size={size} color={color} />
         )
         }} />
-      <Tab.Screen name='Settings' component={SettingsScreen}
+      <Tab.Screen name='Settings' children={() => <SettingsScreen item={item}/>}
         options={{
         tabBarIcon: ({ focused, color, size}) => (
           <Ionicons name='settings-outline' size={size} color={color} />

@@ -11,53 +11,59 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { fetchUser } from '../redux/actions/index'
 
-import tempData from './tempData'
-import RoomList from './RoomList'
-
 export class SplashScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      room: {
-        name:[],
-        image:[]
-      }
+      rooms: []
     }
   }
 
   UNSAFE_componentWillMount() {
-    const readRoomData = () => {
-      firebase.firestore()
+    const roomRef = firebase.firestore()
       .collection("rooms")
-      .get()
-      .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          this.setState({ name: this.state.room.name.concat(doc.data().name) })
-          this.setState({ image: this.state.room.image.concat(doc.data().image)})
+      .onSnapshot((querySnapshot) => {
+      const rooms = [];
+      
+      querySnapshot.forEach(documentSnapshot => {
+        rooms.push({
+          ...documentSnapshot.data(),
+          key: documentSnapshot.id,
         });
-        //console.log('name is: '+ this.state.name + '/// image url: ' + this.state.image)
+      });
+
+      this.setState({
+        rooms: rooms
+      })
+      console.log(rooms); 
     });
-    }
     //readRoomData();
   }
 
   componentDidMount() {
     this.props.fetchUser();
-    
   }
 
-
   render() {
-    
     return (
       <View style={styles.container}>
           <View style={styles.showImage}>
             <FlatList 
-              data={tempData}
+              data={this.state.rooms}
               keyExtractor={item => item.name} 
               horizontal={true}
               showsHorizontalScrollIndicator={false}
-              renderItem={({ item }) => <RoomList list={item} />}
+              renderItem={({ item }) => <View >
+                <TouchableOpacity activeOpacity={0.8} onPress={() => this.props.navigation.navigate('MainTabScreen', item)}>
+                    <Image source={{ uri: item.image }} style={[styles.listContainer]} />
+                </TouchableOpacity>
+    
+                <View style={{ alignItems: "center" , justifyContent: "center"}}> 
+                    <Text numberOfLines={1} >
+                        {item.name}
+                    </Text>
+                </View> 
+            </View>}
             />
           </View>
         {/*<View style={styles.header}>
@@ -182,6 +188,15 @@ const styles = StyleSheet.create({
       borderRadius: 125,
       backgroundColor: 'grey'
     },
+    listContainer: {
+      paddingVerticle: 32,
+      paddingHorizontal: 16,
+      borderRadius: 125,
+      marginHorizontal: 12,
+      //alignItems: "center",
+      width: 250,
+      height: 250,
+  }
 });
 
 export default connect(null, mapDispatchProps)(SplashScreen);
