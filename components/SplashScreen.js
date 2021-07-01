@@ -1,27 +1,73 @@
-import React, { Component } from 'react';
-import { View, StyleSheet, Text, Dimensions } from 'react-native'
+import React, { Component, useState } from 'react';
+import { View, StyleSheet, Text, Dimensions, Image, FlatList } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Animatable from 'react-native-animatable';
 import firebase from 'firebase'
+import "firebase/firestore"
+import "firebase/storage"
+import 'firebase/auth';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { fetchUser } from '../redux/actions/index'
 
-const Oval = () => {
-  return <View style={styles.oval} />;
-};
-
 export class SplashScreen extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      rooms: []
+    }
+  }
+
+  UNSAFE_componentWillMount() {
+    const roomRef = firebase.firestore()
+      .collection("rooms")
+      .onSnapshot((querySnapshot) => {
+      const rooms = [];
+      
+      querySnapshot.forEach(documentSnapshot => {
+        rooms.push({
+          ...documentSnapshot.data(),
+          key: documentSnapshot.id,
+        });
+      });
+
+      this.setState({
+        rooms: rooms
+      })
+      console.log(rooms); 
+    });
+    //readRoomData();
+  }
+
   componentDidMount() {
     this.props.fetchUser();
   }
+
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Oval />
-        </View>
+          <View style={styles.showImage}>
+            <FlatList 
+              data={this.state.rooms}
+              keyExtractor={item => item.name} 
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item }) => <View >
+                <TouchableOpacity activeOpacity={0.8} onPress={() => this.props.navigation.navigate('MainTabScreen', item)}>
+                    <Image source={{ uri: item.image }} style={[styles.listContainer]} />
+                </TouchableOpacity>
+    
+                <View style={{ alignItems: "center" , justifyContent: "center"}}> 
+                    <Text numberOfLines={1} >
+                        {item.name}
+                    </Text>
+                </View> 
+            </View>}
+            />
+          </View>
+        {/*<View style={styles.header}>
+        </View>*/}
         <Animatable.View animation="fadeInUpBig" style={styles.footer}>
           <View style={styles.button}>
             <TouchableOpacity onPress={() => this.props.navigation.navigate('SignInScreen')}>
@@ -51,12 +97,14 @@ const height_logo = height * 0.28;
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#009387'
+      backgroundColor: '#009387',
+      
     },
     header: {
       flex: 2,
       alignItems: 'center',
       justifyContent: 'center',
+      
     },
     footer: {
       flex: 1,
@@ -97,12 +145,58 @@ const styles = StyleSheet.create({
       fontWeight: 'bold'
     },
     oval: {
-    width: 300,
-    height: 300,
-    borderRadius: 150,
-    backgroundColor: "grey",
+      width: 250,
+      height: 250, 
+      borderRadius: 125,
+      backgroundColor: 'grey'
     },
-
+    wrapper: {},
+    slide1: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#9DD6EB'
+    },
+    slide2: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#97CAE5'
+    },
+    slide3: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#92BBD9'
+    },
+    text: {
+      color: '#fff',
+      fontSize: 30,
+      fontWeight: 'bold'
+    },
+    showImage: {
+      flex: 2,
+      paddingTop: 32,
+      paddingBottom: 32,
+      paddingLeft: 16,
+      paddingRight: 16,
+      justifyContent: 'center',
+    },
+    showBlankImage: {
+      width: 250,
+      height: 250, 
+      borderRadius: 125,
+      backgroundColor: 'grey'
+    },
+    listContainer: {
+      paddingVerticle: 32,
+      paddingHorizontal: 16,
+      borderRadius: 125,
+      marginHorizontal: 12,
+      //alignItems: "center",
+      width: 250,
+      height: 250,
+  }
 });
 
 export default connect(null, mapDispatchProps)(SplashScreen);

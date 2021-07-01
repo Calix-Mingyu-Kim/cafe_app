@@ -15,41 +15,38 @@ import ChatScreen from './main/ChatScreen';
 
 const Tab = createBottomTabNavigator();
 
-export class MainTabScreen extends Component {
-  render() {
-    return (
-      <Tab.Navigator initialRouteName='Home' labeled={false} 
-        tabBarOptions={{
-        activeTintColor: 'tomato',
-        inactiveTintColor: 'gray',
-        }}>
-        <Tab.Screen name='Home' component={HomeScreen}
-          options={{
-          tabBarIcon: ({ focused, color, size}) => (
-            <Ionicons name='home-outline' size={size} color={color} />
-          )
-          }} />
-        <Tab.Screen name='Chat' component={ChatScreen}
-          options={{
-          tabBarIcon: ({ focused, color, size}) => (
-            <Ionicons name='chatbubble-outline' size={size} color={color} />
-          )
-          }} />
-        <Tab.Screen name='Notifications' component={NotificationScreen}
-          options={{
-          tabBarIcon: ({ focused, color, size}) => (
-            <Ionicons name='notifications-outline' size={size} color={color} />
-          )
-          }} />
-        <Tab.Screen name='Settings' component={SettingsScreen}
-          options={{
-          tabBarIcon: ({ focused, color, size}) => (
-            <Ionicons name='settings-outline' size={size} color={color} />
-          )
-          }} />
-      </Tab.Navigator>
-    )
-  }
+export default function MainTabScreen ({ navigation, route }) {
+  const item = route.params;
+  return (
+    <Tab.Navigator initialRouteName='Home' labeled={false} 
+      tabBarOptions={{
+      activeTintColor: 'tomato',
+      inactiveTintColor: 'gray',
+      }}>
+      <Tab.Screen name='Home' children={() => <HomeScreen item={item}/>}
+        options={{
+        tabBarIcon: ({ focused, color, size}) => (
+          <Ionicons name='home-outline' size={size} color={color} />
+        )
+        }} />
+      <Tab.Screen name='Chat' component={ChatScreen}
+        options={{
+        tabBarIcon: ({ focused, color, size}) => (
+          <Ionicons name='chatbubble-outline' size={size} color={color} />
+        )
+        }} />
+      <Tab.Screen name='Notifications' component={NotificationScreen}
+        options={{
+        tabBarIcon: ({ focused, color, size}) => (
+          <Ionicons name='notifications-outline' size={size} color={color} />
+        )
+        }} />
+      <Tab.Screen name='Settings' children={() => <SettingsScreen item={item}/>}
+        options={{
+        tabBarIcon: ({ focused, color, size}) => (
+          <Ionicons name='settings-outline' size={size} color={color} />
+        )
+        }} />
+    </Tab.Navigator>
+  )
 }
-
-export default MainTabScreen;
